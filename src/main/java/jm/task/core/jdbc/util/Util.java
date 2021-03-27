@@ -1,8 +1,19 @@
 package jm.task.core.jdbc.util;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
+import org.hibernate.dialect.Dialect;
+
+import javax.imageio.spi.ServiceRegistry;
+import java.rmi.registry.Registry;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class Util {
 //    private static volatile Util instance;
@@ -25,6 +36,7 @@ public class Util {
 //        return localInstance;
 //    }
 
+    // JDBC connection
     public static Connection getConnection() {
         Connection connection = null;
         try {
@@ -36,5 +48,37 @@ public class Util {
             e.printStackTrace();
         }
         return connection;
+    }
+
+    // Hibernate connection
+    public static SessionFactory getSession() {
+        SessionFactory sessionFactory = null;
+
+        Properties properties = new Properties();
+        properties.put(Environment.DRIVER, DRIVER);
+        properties.put(Environment.URL, URL);
+        properties.put(Environment.USER, USERNAME);
+        properties.put(Environment.PASS, PASSWORD);
+        properties.put(Environment.DIALECT, "org.hibernate.dialect.MySQL5InnoDBDialect");
+        properties.put(Environment.SHOW_SQL, true);
+        properties.put(Environment.HBM2DDL_AUTO, "none");
+
+        Configuration configuration = new Configuration();
+        configuration.setProperties(properties);
+        configuration.addAnnotatedClass(jm.task.core.jdbc.util.Util.class);
+
+        final ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+                .applySettings(configuration.getProperties())
+                .build();
+
+        try {
+            sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+            System.out.println("SessionFactory - создан");
+        } catch (Exception e) {
+            System.out.println("SessionFactory - НЕ создан");
+            e.printStackTrace();
+            StandardServiceRegistryBuilder.destroy(serviceRegistry);
+        }
+        return sessionFactory;
     }
 }
