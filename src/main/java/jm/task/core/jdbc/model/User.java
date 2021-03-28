@@ -8,13 +8,10 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(name = "user_name")
     private String name;
-
     @Column(name = "user_last_name")
     private String lastName;
-
     @Column(name = "user_age")
     private Byte age;
 
