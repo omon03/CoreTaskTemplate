@@ -11,6 +11,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class Util {
@@ -20,19 +22,6 @@ public class Util {
         "jdbc:mysql://localhost:3306/jmdb?autoReconnect=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "buddabar";
-
-//    public static Util getInstance() {
-//        Util localInstance = instance;
-//        if (localInstance == null) {
-//            synchronized (Util.class) {
-//                localInstance = instance;
-//                if (localInstance == null){
-//                    instance = localInstance = new Util();
-//                }
-//            }
-//        }
-//        return localInstance;
-//    }
 
     // JDBC connection
     public static Connection getConnection() {
@@ -55,6 +44,8 @@ public class Util {
     public static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
             try {
+                Logger.getLogger("org.hibernate").setLevel(Level.SEVERE);
+
                 // Hibernate settings equivalent to hibernate.cfg.xml's properties
                 Properties properties = new Properties();
                 properties.put(Environment.DRIVER, DRIVER);
