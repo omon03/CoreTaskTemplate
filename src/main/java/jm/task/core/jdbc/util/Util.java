@@ -1,5 +1,6 @@
 package jm.task.core.jdbc.util;
 
+import jm.task.core.jdbc.model.User;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -60,7 +61,7 @@ public class Util {
 
                 Configuration configuration = new Configuration();
                 configuration.setProperties(properties);
-                configuration.addAnnotatedClass(Util.class);
+                configuration.addAnnotatedClass(User.class);
 
                 serviceRegistry = new StandardServiceRegistryBuilder()
                         .applySettings(configuration.getProperties())
