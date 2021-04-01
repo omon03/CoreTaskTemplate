@@ -1,19 +1,20 @@
 package jm.task.core.jdbc.util;
 
-import org.hibernate.Session;
+import jm.task.core.jdbc.model.User;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
-import org.hibernate.dialect.Dialect;
+import org.hibernate.service.ServiceRegistry;
 
-import javax.imageio.spi.ServiceRegistry;
-import java.rmi.registry.Registry;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 public class Util {
 //    private static volatile Util instance;
@@ -22,19 +23,6 @@ public class Util {
         "jdbc:mysql://localhost:3306/jmdb?autoReconnect=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "buddabar";
-
-//    public static Util getInstance() {
-//        Util localInstance = instance;
-//        if (localInstance == null) {
-//            synchronized (Util.class) {
-//                localInstance = instance;
-//                if (localInstance == null){
-//                    instance = localInstance = new Util();
-//                }
-//            }
-//        }
-//        return localInstance;
-//    }
 
     // JDBC connection
     public static Connection getConnection() {
@@ -50,34 +38,42 @@ public class Util {
         return connection;
     }
 
+    private static SessionFactory sessionFactory;
+    private static ServiceRegistry serviceRegistry;
+
     // Hibernate connection
-    public static SessionFactory getSession() {
-        SessionFactory sessionFactory = null;
+    public static SessionFactory getSessionFactory() {
+        if (sessionFactory == null) {
+            try {
+                Logger.getLogger("org.hibernate").setLevel(Level.SEVERE);
 
-        Properties properties = new Properties();
-        properties.put(Environment.DRIVER, DRIVER);
-        properties.put(Environment.URL, URL);
-        properties.put(Environment.USER, USERNAME);
-        properties.put(Environment.PASS, PASSWORD);
-        properties.put(Environment.DIALECT, "org.hibernate.dialect.MySQL5InnoDBDialect");
-        properties.put(Environment.SHOW_SQL, true);
-        properties.put(Environment.HBM2DDL_AUTO, "none");
+                // Hibernate settings equivalent to hibernate.cfg.xml's properties
+                Properties properties = new Properties();
+                properties.put(Environment.DRIVER, DRIVER);
+                properties.put(Environment.URL, URL);
+                properties.put(Environment.USER, USERNAME);
+                properties.put(Environment.PASS, PASSWORD);
+                properties.put(Environment.DIALECT, "org.hibernate.dialect.MySQL5Dialect");
+                properties.put(Environment.SHOW_SQL, true);
+                properties.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+                properties.put(Environment.ORDER_UPDATES, "true");
+                properties.put(Environment.HBM2DDL_AUTO, "create-drop");
 
-        Configuration configuration = new Configuration();
-        configuration.setProperties(properties);
-        configuration.addAnnotatedClass(jm.task.core.jdbc.util.Util.class);
+                Configuration configuration = new Configuration();
+                configuration.setProperties(properties);
+                configuration.addAnnotatedClass(User.class);
 
-        final ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
-                .applySettings(configuration.getProperties())
-                .build();
+                serviceRegistry = new StandardServiceRegistryBuilder()
+                        .applySettings(configuration.getProperties())
+                        .build();
 
-        try {
-            sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-            System.out.println("SessionFactory - создан");
-        } catch (Exception e) {
-            System.out.println("SessionFactory - НЕ создан");
-            e.printStackTrace();
-            StandardServiceRegistryBuilder.destroy(serviceRegistry);
+                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+                System.out.println("SessionFactory - создан");
+            } catch (Exception e) {
+                System.out.println("SessionFactory - НЕ создан");
+                e.printStackTrace();
+                StandardServiceRegistryBuilder.destroy(serviceRegistry);
+            }
         }
         return sessionFactory;
     }

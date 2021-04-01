@@ -12,6 +12,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
 
     public UserDaoJDBCImpl() { }
 
+    @Override
     public void createUsersTable() throws SQLException {
         if (connection == null) {
             connection = getConnection();
@@ -32,6 +33,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
         }
     }
 
+    @Override
     public void dropUsersTable() throws SQLException {
         if (connection == null) {
             connection = getConnection();
@@ -49,6 +51,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
         }
     }
 
+    @Override
     public void saveUser(String name, String lastName, byte age) throws SQLException {
 
         String sqlCommand = "INSERT INTO user (user_name, user_last_name, user_age) VALUES ((?), (?), (?))";
@@ -70,6 +73,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
         }
     }
 
+    @Override
     public void removeUserById(long id) throws SQLException {
         String sql = "DELETE FROM user WHERE id = ?";
         if (connection == null) {
@@ -86,6 +90,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
         }
     }
 
+    @Override
     public List<User> getAllUsers() throws SQLException {
         List<User> list = new ArrayList<>();
         if (connection == null) {
@@ -97,7 +102,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
             ResultSet resultSet = st.executeQuery("SELECT * FROM user");
             while (resultSet.next()) {
                 User tUser = new User();
-                tUser.setId(resultSet.getLong("id"));
+//                tUser.setId(resultSet.getLong("id"));
                 tUser.setName(resultSet.getString("user_name"));
                 tUser.setLastName(resultSet.getString("user_last_name"));
                 tUser.setAge(resultSet.getByte("user_age"));
@@ -110,6 +115,7 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
         return list;
     }
 
+    @Override
     public void cleanUsersTable() throws SQLException {
         if (connection == null) {
             connection = getConnection();

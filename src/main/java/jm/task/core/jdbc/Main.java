@@ -4,6 +4,7 @@ import jm.task.core.jdbc.dao.UserDao;
 import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
 import jm.task.core.jdbc.service.UserService;
 import jm.task.core.jdbc.service.UserServiceImpl;
+import jm.task.core.jdbc.util.Util;
 
 /**
  *  Создание таблицы User(ов)
@@ -28,9 +29,9 @@ public class Main {
         us.saveUser(name, lastName, age);
 
         us.getAllUsers().forEach(System.out::println);
-
         us.cleanUsersTable();
-
         us.dropUsersTable();
+
+        Util.getSessionFactory().close();
     }
 }
